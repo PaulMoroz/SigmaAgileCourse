@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>DocScanner</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="style.css" />
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+		<script src="script.js"></script>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	</head>
+	<body>
+		<div class="screen state_normal" id="mainScreen">
+			<div class="container">
+				<div class="selection_header">
+					<a href="#" id="exitselectionBtn" class="btn btn-primary">Done</a>
+					<a href="#" id="selectallBtn" class="btn btn-secondary">Select all</a>
+					<a href="#" id="removeselectedBtn" class="btn btn-danger">Delete selected <span class="badge badge-light">0</span></a>
+				</div>
+				<div class="header">
+					<a href="#" id="enterselectionBtn" class="btn btn-secondary">Select</a>
+					<input type="text" id="output_filename" class="form-control" placeholder="Scan" />
+				</div>
+				<div class="main">
+					<div class="images" id="container_images">
+					</div>
+					<a class="button floating-button btn btn-secondary" id="addimageBtn" href="#">Add image</a>
+					<input type="file" id="fileselectorInput" />
+				</div>
+				<div class="footer">
+					<div class="form-group">
+						<label for="outputlanguageSelect">Language:</label>
+						<select id="exampleFormControlInput1" class="form-control">
+							<option>Auto</option>
+							<option>English</option>
+							<option>Ukrainian</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="exampleFormControlInput2">Result type:</label>
+						<select id="exampleFormControlInput2" class="form-control">
+							<option>TXT</option>
+							<option>Word Document (DOCX)</option>
+							<option>PDF</option>
+						</select>
+					</div>
+					<div class="btn-group btn-group-toggle" data-toggle="buttons">
+						<label class="btn btn-secondary active">
+							<input type="radio" name="options" id="option1" checked> Single file
+						</label>
+						<label class="btn btn-secondary">
+							<input type="radio" name="options" id="option2"> Separate files
+						</label>
+					</div>
+					<button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="collapse" data-target="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1" id="previewBtn">Text preview</button>
+					<button type="button" id="downloadBtn" class="btn btn-primary">Download result</button>
+				</div>
+			</div>
+		</div>
+		<div class="screen" id="previewScreen">
+			<div class="collapse" id="collapseExample1">
+				<div class="card card-body">
+					Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+				</div>
+			</div>
+		</div>
+		<script>
+			init();
+		</script>
+	</body>
+</html>

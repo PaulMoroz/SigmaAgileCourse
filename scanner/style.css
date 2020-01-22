@@ -1,0 +1,30 @@
+body {
+	margin: 0;
+}
+.images {
+	border: 1px solid black;
+}
+.images img {
+	height: 100px;
+}
+
+.state_normal .selection_header {
+	display: none;
+}
+.state_selection .selection_header {
+	display: block;
+}
+
+.state_normal .item_removebutton {
+	display: block;
+}
+.state_selection .item_removebutton {
+	display: none;
+}
+
+.state_normal .item_selectioncheck {
+	display: none;
+}
+.state_selection .item_selectioncheck {
+	display: block;
+}
