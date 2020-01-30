@@ -7,22 +7,21 @@ from table import Table
 from table_main import find_table
 import cv2 as cv
 import numpy as np
-
+#=============================
 #RECOGNIZING TEXT ON THE IMAGE
-
+#=============================
 def transform(image,to):
 	if to == "PIL":
-		img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+		img = cv.cvtColor(image, cv.COLOR_BGR2RGB)
 		im_pil = Image.fromarray(img)
 		return im_pil
 	else:
-		opencvImage = cv2.cvtColor(numpy.array(image), cv2.COLOR_RGB2BGR)
+		opencvImage = cv.cvtColor(np.array(image), cv.COLOR_RGB2BGR)
 		return opencvImage
 
-
-
 def recognize(image):
-	return tess.image_to_string(image,config='-c preserve_interword_spaces=1')
+	#,config='-c preserve_interword_spaces=1',config='--psm = 10'
+	return tess.image_to_string(image)
  
 
  #Splitting images to table and no-table
@@ -37,11 +36,12 @@ def image_split(image_path):
 	tabs = find_table(cv.imread(image_path))
 	tabs.insert(0,Table(0,0,0,0)) 
 	tabs.append(Table(0,height,0,0))
-	for i in range(0,len(tabs)):
-		cropped.append(image.crop((tab[i].x,tab[i].y,tab[i].x+tab[i].w,tab[i].y+ tab[i].h)))
-		cropped.append(image.crop(0,tab[i].y+tab[i].h,width,tab[i+1].y))
-	cropped = cropped[1:len(cropped)-1] 
-	tabs = tabs[1:len(tabs)-1]
+	print(len(tabs))
+	for i in range(0,len(tabs)-1):
+		cropped.append(image.crop((tabs[i].x,tabs[i].y,tabs[i].x+tabs[i].w,tabs[i].y+ tabs[i].h)))
+		cropped.append(image.crop((0,tabs[i].y+tabs[i].h,width,tabs[i+1].y)))
+	cropped = cropped[1:]
+	tabs = tabs[1:]
 	return cropped,tabs 
 
 #CREATING PDF DOCUMENT WITH RECOGNIZED TEXT
@@ -49,31 +49,31 @@ def image_split(image_path):
 def to_pdf():
 	htmlcode = ""
 	im_pieces,tabs = image_split()
-	for k in range(0,len(tabs)):
+	for k in range(len(im_pieces)):
+		print("k//2 ",k//2," k ",k)
 		if k%2==0 :
-			htmlcode += "<p>" + (recognize(im_pieces[k])) + "</p>"
+			doc.add_paragraph(recognize(im_pieces[k]))
 		else:
+			table_entries = tabs[k//2].get_table_entries()
+			htmlcode += "<p>" + (recognize(im_pieces[k])) + "</p>"
+			print("Rows, cols",len(table_entries),len(table_entries[0]))
 			htmlcode += "<table>"
-			table_entries = tabs[k/2].get_table_entries()
-			table_roi = transform(im_pieces[i],"cv")
-			table_roi = cv.resize(im_pieces[i], (table.w * 3, table.h * 3))
-    		for i in range(len(table_entries)):
-    			htmlcode += "<tr>"
-	        	row = table_entries[i]
-			        for j in range(len(row)):  
-			        	entry = row[j]
-	            		entry_roi = table_roi[entry[1] * 3: (entry[1] + entry[3]) * 3, entry[0] * 3:(entry[0] + entry[2]) * 3]  
-			        	htmlcode += "<td> " + str(recognize(transform(table_roi[entry[1] * 3: (entry[1] + entry[3]) * 3, entry[0] * 3:(entry[0] + entry[2]) * 3],"PIL"))) + "</td>"
-			        htmlcode += "</tr>"
-			htmlcode += "</table>"
-    pdf = HTML2PDF()
-    pdf.add_page()
-    pdf.write_html(htmlcode)
-	"""
-	pdf = FPDF()
-	pdf.set_font("Arial",size = 12)
-	pdf.cell(200, 10, txt=recognize(Image.open(sys.argv[1]),ln = 1, align="L"))
-	"""
+			table_roi = transform(im_pieces[k],"cv")
+			table_roi = cv.resize(table_roi, (tabs[k//2].w * 3, tabs[k//2].h * 3))
+			
+			try:
+				for i in range(len(table_entries)):
+					row = table_entries[i]
+					for j in range(len(row)):  
+						entry = row[j]
+						entry_roi = table_roi[entry[1] * 3: (entry[1] + entry[3]) * 3, entry[0] * 3:(entry[0] + entry[2]) * 3]
+						htmlcode += "<td> " + str(recognize(transform(table_roi[entry[1] * 3: (entry[1] + entry[3]) * 3, entry[0] * 3:(entry[0] + entry[2]) * 3],"PIL"))) + "</td>"
+			except:
+				print("Table Entries" ,len(table_entries))
+			htmlcode+="</table>"
+	pdf = HTML2PDF()
+	pdf.add_page()
+	pdf.write_html(htmlcode)
 	pdf.output(str(sys.argv[2])+".pdf")
 
 
@@ -81,24 +81,30 @@ def to_pdf():
 
 def to_word():
 	doc = Document()
-	im_pieces,tabs = image_split(sys.argv[1])
-	for k in range(0,len(tabs)):
+	im_pieces,tabs = image_split(sys.argv[1]) 
+	print("Lenght of image pieces",len(im_pieces))
+	for k in range(len(im_pieces)):
+		print("k//2 ",k//2," k ",k)
 		if k%2==0 :
-			doc = doc.add_paragraph(recognize(im_pieces[k]))
+			doc.add_paragraph(recognize(im_pieces[k]))
 		else:
-			table_entries = tabs[k/2].get_table_entries()
-			table = doc.add_table(rows = table_entries,cols = len(table_entries[0]))
-			table_roi = transform(im_pieces[i],"cv")
-			table_roi = cv.resize(im_pieces[i], (table.w * 3, table.h * 3))
-    		for i in range(len(table_entries)):
-	        	row = table_entries[i]
-			        for j in range(len(row)):  
-			        	entry = row[j]
-	            		entry_roi = table_roi[entry[1] * 3: (entry[1] + entry[3]) * 3, entry[0] * 3:(entry[0] + entry[2]) * 3]  
-			        	table.cell(i,j).text = str(recognize(transform(table_roi[entry[1] * 3: (entry[1] + entry[3]) * 3, entry[0] * 3:(entry[0] + entry[2]) * 3],"PIL")))
-
+			table_entries = tabs[k//2].get_table_entries()
+			print("Rows, cols",len(table_entries),len(table_entries[0]))
+			table = doc.add_table(rows = len(table_entries),cols =  len(table_entries[0]))
+			table_roi = transform(im_pieces[k],"cv")
+			table_roi = cv.resize(table_roi, (tabs[k//2].w * 3, tabs[k//2].h * 3))
+			
+			try:
+				for i in range(len(table_entries)):
+					row = table_entries[i]
+					for j in range(len(row)):  
+						entry = row[j]
+						entry_roi = table_roi[entry[1] * 3: (entry[1] + entry[3]) * 3, entry[0] * 3:(entry[0] + entry[2]) * 3]
+						table.cell(i,j).text = str(recognize(transform(table_roi[entry[1] * 3: (entry[1] + entry[3]) * 3, entry[0] * 3:(entry[0] + entry[2]) * 3],"PIL")))
+			except:
+				print("Table Entries" ,len(table_entries))
 	doc.save(str(sys.argv[2])+".docx")
-
+	
 
 #CREATING TXT DOCUMENT WITH RECOGNIZED TEXT
 
@@ -111,15 +117,20 @@ def to_txt():
 			f.write(recognize(im_pieces[k]))
 		else:
 			table_entries = tabs[k//2].get_table_entries()
-			table_roi = transform(im_pieces[i],"cv")
-			table_roi = cv.resize(im_pieces[i], (table.w * 3, table.h * 3))
-    		for i in range(len(table_entries)):
-	        	row = table_entries[i]
-			        for j in range(len(row)):
-			        	entry = row[j]
-	            		entry_roi = table_roi[entry[1] * 3: (entry[1] + entry[3]) * 3, entry[0] * 3:(entry[0] + entry[2]) * 3]  
-			        	f.write(str(recognize(transform(table_roi[entry[1] * 3: (entry[1] + entry[3]) * 3, entry[0] * 3:(entry[0] + entry[2]) * 3],"PIL")))+"\t")
-			        f.write("\n")
+			print("Rows, cols",len(table_entries),len(table_entries[0]))
+			table = doc.add_table(rows = len(table_entries),cols =  len(table_entries[0]))
+			table_roi = transform(im_pieces[k],"cv")
+			table_roi = cv.resize(table_roi, (tabs[k//2].w * 3, tabs[k//2].h * 3))
+			try:
+				for i in range(len(table_entries)):
+					row = table_entries[i]
+					for j in range(len(row)):  
+						entry = row[j]
+						entry_roi = table_roi[entry[1] * 3: (entry[1] + entry[3]) * 3, entry[0] * 3:(entry[0] + entry[2]) * 3]
+						f.write( str(recognize(transform(table_roi[entry[1] * 3: (entry[1] + entry[3]) * 3, entry[0] * 3:(entry[0] + entry[2]) * 3],"PIL"))) + "\t")
+					fwrite("\n")
+			except:
+				print("Table Entries" ,len(table_entries))
 	f.write(recognize(Image.open(sys.argv[1])))
 	f.close()
 
