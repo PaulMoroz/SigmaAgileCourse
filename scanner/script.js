@@ -3,9 +3,9 @@
 let fileReaders;
 let fl;
 let result_id;
-let result_ids;
-let preview;
-let preview_s;
+// let result_ids;
+// let preview;
+// let preview_s;
 // let mode;
 
 const EXTENSIONS = ['txt', 'docx', 'pdf'];
@@ -60,7 +60,7 @@ function getFormType() {
 }
 
 function getFormName() {
-	return document.forms.name_form.name_input.value;
+	return document.getElementById('output_filename').value;
 }
 
 // --
@@ -75,9 +75,6 @@ function getFormFiles() {
 
 function init() {
 	result_id = 0;
-	result_ids = [];
-	preview = false;
-	preview_s = false;
 	// mode = MODE_SINGLE;
 	
 	fileReaders = {};
@@ -181,44 +178,26 @@ function init() {
 	
 	outputlanguageSelect.change(function(e) { // вибір іншої мови
 		result_id = 0;
-		result_ids.clear();
-		preview = false;
-		preview_s = false;
 	});
 	
 	downloadBtn.click(async function() {
-		if (getFormMode()) { // separate mode
-			alert("separate mode");
-			if (!result_ids) {
-				result_ids = api.new_scan_separate({	language: getFormLanguage(),
-													files: getFormFiles()
-												});
-			}
-			api.download_zip({
-							scan_ids: result_ids,
-							type: getFormType(),
-							name: getFormName()
-						 });
-		} else { // single mode
-			alert("single mode");
-			if (!result_id) {
-				result_id = await api.new_scan({	language: getFormLanguage(),
-													files: getFormFiles()
-												});
-			}
-			let result_blob = await api.download({
-							scan_id: result_id,
-							type: getFormType(),
-							name: getFormName()
-						 });
-			
-			let link = document.createElement('a');
-			link.download = params.name + extensions[params.type];
-			link.href = URL.createObjectURL(result_blob);
-			
-			link.click();
-			
-			URL.revokeObjectURL(link.href);
+		if (!result_id) {
+			result_id = await api.new_scan({	language: getFormLanguage(),
+												files: getFormFiles()
+											});
 		}
+		let result_blob = await api.download({
+						scan_id: result_id,
+						type: getFormType(),
+						name: getFormName()
+					 });
+		
+		let link = document.createElement('a');
+		link.download = params.name + extensions[params.type];
+		link.href = URL.createObjectURL(result_blob);
+		
+		link.click();
+		
+		URL.revokeObjectURL(link.href);
 	});
 }

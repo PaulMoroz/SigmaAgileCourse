@@ -1,5 +1,15 @@
+/* html, body {
+    height: 100%;
+} */
 body {
 	margin: 0;
+}
+
+.state_normal .header {
+	display: block;
+}
+.state_selection .header {
+	display: none;
 }
 
 .state_normal .selection_header {
@@ -43,3 +53,7 @@ body {
 #fileselectorInput {
 	display: none;
 }
+
+/* .main {
+	min-height: 100vh;
+} */
