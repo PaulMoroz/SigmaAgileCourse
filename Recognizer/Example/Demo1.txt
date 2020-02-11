@@ -1,0 +1,5 @@
+import os.
+folder = os.listdir("/home/pavlo/Desktop")
+
+for file in folder
+if File.endwith("pr
