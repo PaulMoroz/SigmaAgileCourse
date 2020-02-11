@@ -6,23 +6,79 @@ let result_id;
 let result_ids;
 let preview;
 let preview_s;
-let mode;
+// let mode;
+
+const EXTENSIONS = ['txt', 'docx', 'pdf'];
 
 const MODE_SINGLE = 0;
 const MODE_SEPARATE = 1;
 
+api = {
+	new_scan: function(params) {
+		let formData = new FormData();
+		formData.append('language', params.language);
+		params.files.forEach((fileElement) => {
+			formData.append('item_file', fileElement.files[0], '');
+		});
+		
+		let response = await fetch('http://localhost/scanner_php/new_scan.php', {
+			method: 'POST',
+			body: formData
+		});
+		
+		let result = await response.json();
+		
+		return result.scan_id;
+	},
+	download: function(params) {		
+		let formData = new FormData();
+		formData.append('scan_id', params.scan_id);
+		formData.append('type', params.type);
+		formData.append('name', params.name);
+		
+		let response = await fetch('http://localhost/scanner_php/download.php', {
+			method: 'POST',
+			body: formData
+		});
+		
+		return await response.blob();
+	}
+}
+
 function readerLoaded(e) {
 	//alert(this.idx);
 	let img = fileReaders[this.idx];
-	img.prop("src", e.target.result);
-};
+	img.prop("style", "background-image: url(" + e.target.result + ")");
+}
+
+function getFormMode() {
+	return 0;
+}
+
+function getFormType() {
+	return +document.forms.options_form.filetype_select.value;
+}
+
+function getFormName() {
+	return document.forms.name_form.name_input.value;
+}
+
+// --
+
+function getFormLanguage() {
+	return document.forms.options_form.language_select.value;
+}
+
+function getFormFiles() {
+	return document.forms.files_form.getElementsByClassName("files_form_file");
+}
 
 function init() {
 	result_id = 0;
 	result_ids = [];
 	preview = false;
 	preview_s = false;
-	mode = MODE_SINGLE;
+	// mode = MODE_SINGLE;
 	
 	fileReaders = {};
 	fl = [];
@@ -44,6 +100,8 @@ function init() {
 	let downloadBtn = $("#downloadBtn");
 	let previewBtn = $("#previewBtn");
 	
+	// let itemSelectionCheck_s = $("item_selectioncheck");
+		
 	enterselectionBtn.click(function() {
 		mainScreen.toggleClass("state_normal", false); // remove state_normal
 		mainScreen.toggleClass("state_selection", true); // add state_selection
@@ -59,13 +117,14 @@ function init() {
 		fileselectorInput.trigger("click");
 	});
 	fileselectorInput.change(function() {
-		let new_item = $("<div>", {class: "item"});
+		let new_item = $("<div>", {class: "item col-md-4"});
 		
 		
 		let fileinput_clone = $(this).clone();
 		fileinput_clone.attr("id", "");
+		fileinput_clone.attr("class", "item_fileinput");
 		
-		let new_item_preview = $("<img>", {src: ""});
+		let new_item_preview = $("<div>", {class: "item_image"});
 		
 		
 		
@@ -128,16 +187,38 @@ function init() {
 	});
 	
 	downloadBtn.click(function() {
-		if (mode) { // separate mode
-			if (result_ids.length == 0) {
-				result_ids = my_api_newscan_separate();
+		if (getFormMode()) { // separate mode
+			alert("separate mode");
+			if (!result_ids) {
+				result_ids = api.new_scan_separate({	language: getFormLanguage(),
+													files: getFormFiles()
+												});
 			}
-			my_api_download_zip();
+			api.download_zip({
+							scan_ids: result_ids,
+							type: getFormType(),
+							name: getFormName()
+						 });
 		} else { // single mode
-			if (result_id == 0) {
-				result_id = my_api_newscan();
+			alert("single mode");
+			if (!result_id) {
+				result_id = api.new_scan({	language: getFormLanguage(),
+													files: getFormFiles()
+												});
 			}
-			my_api_download();
+			let result_blob = api.download({
+							scan_id: result_id,
+							type: getFormType(),
+							name: getFormName()
+						 });
+			
+			let link = document.createElement('a');
+			link.download = params.name + extensions[params.type];
+			link.href = URL.createObjectURL(result_blob);
+			
+			link.click();
+			
+			URL.revokeObjectURL(link.href);
 		}
 	});
 }

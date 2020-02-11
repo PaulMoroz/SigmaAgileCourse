@@ -1,12 +1,6 @@
 body {
 	margin: 0;
 }
-.images {
-	border: 1px solid black;
-}
-.images img {
-	height: 100px;
-}
 
 .state_normal .selection_header {
 	display: none;
@@ -16,7 +10,7 @@ body {
 }
 
 .state_normal .item_removebutton {
-	display: block;
+	display: none;
 }
 .state_selection .item_removebutton {
 	display: none;
@@ -27,4 +21,25 @@ body {
 }
 .state_selection .item_selectioncheck {
 	display: block;
+}
+
+.item {
+}
+.item_image {
+    width: 100%;
+    padding-bottom: 100%;
+    background-size: cover;
+    background-position: center;
+}
+.item_fileinput {
+	visibility: hidden;
+}
+.item_selectioncheck {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
+
+#fileselectorInput {
+	display: none;
 }
