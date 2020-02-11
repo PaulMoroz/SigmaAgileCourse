@@ -13,8 +13,8 @@ const EXTENSIONS = ['txt', 'docx', 'pdf'];
 const MODE_SINGLE = 0;
 const MODE_SEPARATE = 1;
 
-api = {
-	new_scan: function(params) {
+const api = {
+	new_scan: async function(params) {
 		let formData = new FormData();
 		formData.append('language', params.language);
 		params.files.forEach((fileElement) => {
@@ -30,7 +30,7 @@ api = {
 		
 		return result.scan_id;
 	},
-	download: function(params) {		
+	download: async function(params) {		
 		let formData = new FormData();
 		formData.append('scan_id', params.scan_id);
 		formData.append('type', params.type);
@@ -186,7 +186,7 @@ function init() {
 		preview_s = false;
 	});
 	
-	downloadBtn.click(function() {
+	downloadBtn.click(async function() {
 		if (getFormMode()) { // separate mode
 			alert("separate mode");
 			if (!result_ids) {
@@ -202,11 +202,11 @@ function init() {
 		} else { // single mode
 			alert("single mode");
 			if (!result_id) {
-				result_id = api.new_scan({	language: getFormLanguage(),
+				result_id = await api.new_scan({	language: getFormLanguage(),
 													files: getFormFiles()
 												});
 			}
-			let result_blob = api.download({
+			let result_blob = await api.download({
 							scan_id: result_id,
 							type: getFormType(),
 							name: getFormName()
