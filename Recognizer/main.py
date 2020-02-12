@@ -89,7 +89,7 @@ def to_pdf():
 			if sys.argv[5] == 'm' or k == len(im_pieces)-1:
 				pdf = HTML2PDF()
 				pdf.add_page()
-				pdf.write_html(htmlcode,'F')
+				pdf.write_html(htmlcode.replace("\n","<br/>"),'F')
 				pdf.output(str(sys.argv[2])+(str(index) if sys.argv[5] == 'm' else "")+".pdf")
 				index+=1
 				htmlcode = ""
