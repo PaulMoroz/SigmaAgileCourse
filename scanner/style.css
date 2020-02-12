@@ -1,22 +1,33 @@
-/* html, body {
+html, body {
     height: 100%;
-} */
+}
 body {
 	margin: 0;
 }
 
-.state_normal .header {
-	display: block;
+.selection_header, .header {
+	transition: all 250ms ease;
 }
-.state_selection .header {
-	display: none;
-}
-
 .state_normal .selection_header {
-	display: none;
+	margin-top: -56px;
+}
+.state_normal .selection_header.header_footer {
+	margin-bottom: -56px;
 }
 .state_selection .selection_header {
-	display: block;
+	margin: 0;
+}
+.state_normal .header.header_footer {
+	margin: 0;
+}
+.state_selection .header.header_footer {
+	margin-bottom: -140px;
+}
+.state_normal .header {
+	margin: 0;
+}
+.state_selection .header {
+	margin-top: -56px;
 }
 
 .state_normal .item_removebutton {
@@ -33,7 +44,17 @@ body {
 	display: block;
 }
 
+#container_images {
+	display: grid;
+	grid-template-columns: 33.33% 33.33% 33.33%;
+}
 .item {
+	padding: 5%;
+	transform: scale(1);
+	transition: all 250ms ease;
+}
+.item.selected {
+	transform: scale(0.8);
 }
 .item_image {
     width: 100%;
@@ -42,18 +63,23 @@ body {
     background-position: center;
 }
 .item_fileinput {
-	visibility: hidden;
+	display: none;
 }
 .item_selectioncheck {
 	position: absolute;
 	bottom: 0;
 	left: 0;
 }
+.state_selection .selected .item_image {
+	opacity: 0.5;
+}
 
 #fileselectorInput {
 	display: none;
 }
 
-/* .main {
+.main {
 	min-height: 100vh;
-} */
+	padding-top: 54px;
+	padding-bottom: 140px;
+}

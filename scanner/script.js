@@ -13,18 +13,27 @@ const EXTENSIONS = ['txt', 'docx', 'pdf'];
 const MODE_SINGLE = 0;
 const MODE_SEPARATE = 1;
 
+let selectedCountText = $(".selectedCountText");
+
+let selectallBtn = $("#selectallBtn");
+
 const api = {
 	new_scan: async function(params) {
 		let formData = new FormData();
 		formData.append('language', params.language);
-		params.files.forEach((fileElement) => {
+		console.log(params.files);
+		[].forEach.call(params.files, (fileElement) => {
 			formData.append('item_file', fileElement.files[0], '');
 		});
 		
-		let response = await fetch('http://localhost/scanner_php/new_scan.php', {
-			method: 'POST',
-			body: formData
-		});
+		try {
+			let response = await fetch('http://ffdf6a58.ngrok.io/startpage/py/new_scan', {
+				method: 'POST',
+				body: formData
+			});
+		} catch (err) {
+			alert(err);
+		}
 		
 		let result = await response.json();
 		
@@ -36,7 +45,7 @@ const api = {
 		formData.append('type', params.type);
 		formData.append('name', params.name);
 		
-		let response = await fetch('http://localhost/scanner_php/download.php', {
+		let response = await fetch('http://ffdf6a58.ngrok.io/startpage/py/download', {
 			method: 'POST',
 			body: formData
 		});
@@ -70,7 +79,12 @@ function getFormLanguage() {
 }
 
 function getFormFiles() {
-	return document.forms.files_form.getElementsByClassName("files_form_file");
+	return document.forms.files_form.getElementsByClassName("item_fileinput");
+}
+
+function updateSelectedCount() {
+	selectedCountText.text($(".item.selected").length);
+	selectallBtn.prop('disabled', !$(".item").length);
 }
 
 function init() {
@@ -90,7 +104,7 @@ function init() {
 	let enterselectionBtn = $("#enterselectionBtn");
 	let exitselectionBtn = $("#exitselectionBtn");
 	
-	let selectallBtn = $("#selectallBtn");
+	
 	
 	let outputlanguageSelect = $("#outputlanguageSelect");
 	
@@ -99,22 +113,33 @@ function init() {
 	
 	// let itemSelectionCheck_s = $("item_selectioncheck");
 		
+	$('#container_images').click(function(e) {
+		if (mainScreen.hasClass('state_selection')) {
+			const parent = $(e.target.parentNode);
+			if (parent.hasClass('item')) {
+				parent.toggleClass('selected');
+			}
+			updateSelectedCount();
+		}
+	});
 	enterselectionBtn.click(function() {
-		mainScreen.toggleClass("state_normal", false); // remove state_normal
-		mainScreen.toggleClass("state_selection", true); // add state_selection
+		updateSelectedCount();
+		
+		mainScreen.toggleClass('state_normal', false); // remove state_normal
+		mainScreen.toggleClass('state_selection', true); // add state_selection
 	});
 	exitselectionBtn.click(function() {
-		// remove all selections
-		$("#container_images .item_selectioncheck").prop("checked", false);
+		mainScreen.toggleClass('state_selection', false); // remove state_selection
+		mainScreen.toggleClass('state_normal', true); // add state_normal
 		
-		mainScreen.toggleClass("state_selection", false); // remove state_selection
-		mainScreen.toggleClass("state_normal", true); // add state_normal
+		// remove all selections
+		$(".item").removeClass('selected');
 	});
 	addimageBtn.click(function() {
 		fileselectorInput.trigger("click");
 	});
 	fileselectorInput.change(function() {
-		let new_item = $("<div>", {class: "item col-md-4"});
+		let new_item = $("<div>", {class: "item #col-md-4"});
 		
 		
 		let fileinput_clone = $(this).clone();
@@ -141,12 +166,9 @@ function init() {
 		
 		let new_item_removebutton = $("<a>", {class: "item_removebutton", text: "x"});
 		
-		let new_item_selectioncheck = $("<input>", {type: "checkbox", class: "item_selectioncheck"});
-		
 		new_item.append(fileinput_clone);
 		new_item.append(new_item_preview);
 		new_item.append(new_item_removebutton);
-		new_item.append(new_item_selectioncheck);
 		
 		images_container.append(new_item);
 		
@@ -156,17 +178,20 @@ function init() {
 		this.value = "";
 		
 		reader.readAsDataURL(fileinput_clone.get(0).files[0]);
+		
+		
+		
+		$('html, body').animate({
+			scrollTop: $(document).height()
+		}, 'slow');
 	});
 	removeselectedBtn.click(function() {
-		$("#container_images .item").each(function(index, value) {
-			if ($(this).find(".item_selectioncheck").prop("checked")) {
-				$(this).remove();
-			};
-		});
+		$("#container_images .item.selected").remove();
+		updateSelectedCount();
 	});
 	selectallBtn.click(function() {
-		// check all selections
-		$("#container_images .item_selectioncheck").prop("checked", true);
+		$("#container_images .item").addClass('selected');
+		updateSelectedCount();
 	});
 	
 	images_container.click(function(e) {
