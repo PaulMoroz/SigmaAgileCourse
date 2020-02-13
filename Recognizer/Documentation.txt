@@ -1,0 +1,64 @@
+Documentation for Recognizer
+
+main.py
+
+function transform: 
+converts image from PIL image format to cv2 format and vice versa, because different functions uses different image format
+
+Input data:
+image( Pil Image or cv2 image) and new type of that image
+
+Returns image in new format
+
+
+functoion recognize:
+recognizes text on the image 
+
+Input data:
+Pil image with text
+
+Returns reccongnized text
+
+
+class HTML2PDF - need for html2pdf correct work
+
+
+function crop:
+divide image into pieces with text or tables. The type of each piece sets in secong element in array. In case image has text only will be marked "common". If it has table, the second element will be table.
+Also in the end of array with image pieces always puts "eof" element.
+
+input data:
+PIL image
+
+output data:
+array with pieces with that image and "eof" in the end of array
+
+
+function image_split:
+this fuction prepare image or images in folder to recognize
+if user wants to transform single image, function call crop() function to this image and return that pieces
+if user wants to transform mort than one image, he enter path to folder with that images and function chechks format of every file in the folder. If that file is image, function call crop() function to this image and extend the result in croppend_all array
+After all it returns cropped_all array
+
+input data:
+path to file or folder and mark file or folder mode
+
+output data:
+array with cropped images
+
+
+function to_pdf:
+makes pdf document with content from pieces on image by making html code of the images and put them in the pdf document
+
+
+
+function to_txt
+makes text document with content from pieces on image. If there is table on the image, program makes it with tabs and endl symbols
+
+
+
+function to_word
+makes docx document with content from pieces on image by adding paragraphs with paragraphs or tables on the images
+
+main:
+reed input in format python main.py path_to_image path_to_outout file format_output_file file/folder_mode single_or_multi_output
