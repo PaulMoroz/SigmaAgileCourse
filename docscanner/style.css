@@ -1,0 +1,85 @@
+html, body {
+    height: 100%;
+}
+body {
+	margin: 0;
+}
+
+.selection_header, .header {
+	transition: all 250ms ease;
+}
+.state_normal .selection_header {
+	margin-top: -56px;
+}
+.state_normal .selection_header.header_footer {
+	margin-bottom: -56px;
+}
+.state_selection .selection_header {
+	margin: 0;
+}
+.state_normal .header.header_footer {
+	margin: 0;
+}
+.state_selection .header.header_footer {
+	margin-bottom: -140px;
+}
+.state_normal .header {
+	margin: 0;
+}
+.state_selection .header {
+	margin-top: -56px;
+}
+
+.state_normal .item_removebutton {
+	display: none;
+}
+.state_selection .item_removebutton {
+	display: none;
+}
+
+.state_normal .item_selectioncheck {
+	display: none;
+}
+.state_selection .item_selectioncheck {
+	display: block;
+}
+
+#container_images {
+	display: grid;
+	grid-template-columns: 33.33% 33.33% 33.33%;
+}
+.item {
+	padding: 5%;
+	transform: scale(1);
+	transition: all 250ms ease;
+}
+.item.selected {
+	transform: scale(0.8);
+}
+.item_image {
+    width: 100%;
+    padding-bottom: 100%;
+    background-size: cover;
+    background-position: center;
+}
+.item_fileinput {
+	display: none;
+}
+.item_selectioncheck {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
+.state_selection .selected .item_image {
+	opacity: 0.5;
+}
+
+#fileselectorInput {
+	display: none;
+}
+
+.main {
+	min-height: 100vh;
+	padding-top: 54px;
+	padding-bottom: 140px;
+}
